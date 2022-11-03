@@ -29,7 +29,7 @@ library(here)
 
 ```{r, message=FALSE, warning=FALSE}
 # Read in the data
-DGEList <- readRDS(here("inst/exdata/mouse_hTREM2_KI_bulk-rna-seq.rds"))
+DGEList <- readRDS(here("inst", "exdata","mouse_hTREM2_KI_bulk-rna-seq.rds"))
 gene.all <- DGEList$genes
 prot.genes <- gene.all %>% filter(meta == "protein_coding")
 

@@ -19,19 +19,17 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, include = FALSE}
 libraries <-
   c("aws.s3",
-    "Seurat",
-    "Matrix",
-    "ggplot2",
     "dplyr",
-    "here")
-lapply(libraries, library, character.only = T)
-
-
-meta <- read.csv(
-  paste0(
-    here(), 
-    "/inst/extdata/Study1_sample_metadata.csv")
+    "ggplot2",
+    "here",
+    "Matrix",
+    "plyr",
+    "Seurat"
 )
+lapply(libraries, library, character.only = TRUE)
+
+
+meta <- read.csv(here("inst", "extdata", "Study1_sample_metadata.csv"))
 
 meta$sample_id <- meta$parent_id
 meta$sample_id <- plyr::mapvalues(
@@ -52,15 +50,16 @@ samples <- c(meta$sample_id)
 # we'll also add the sample-level data to each object.
 
 
-
+# FIXME: does this function read from a local directory? 
 objects <- lapply(
   samples,
   FUN = function(x) {
     object <- Seurat::Read10X(
-      paste0(
-        "Study1/cellranger_7.0.0/",
-        x,
-        "/outs/filtered_feature_bc_matrix"
+      
+      # FIXME: use the file.path function instead of paste0 because different
+      # operating systems use different path delimiters (\ or /).
+      file.path(
+        "Study1", "cellranger_7.0.0", x, "outs", "filtered_feature_bc_matrix"
       ),
       project = "atv_trem2_timecourse"
     ) 
@@ -69,7 +68,7 @@ objects <- lapply(
     
     sample_meta <-
       meta %>% 
-      dplyr::filter(sample_id == x) #subsetting the meta data
+      dplyr::filter(meta, sample_id == x) #subsetting the meta data
     
     object@meta.data <-
       object@meta.data %>% 
@@ -78,7 +77,8 @@ objects <- lapply(
     rownames(object@meta.data) <-
       colnames(object) #resetting rownames, because they get dropped
     
-    object
+    # FIXME: I like to use explicit return statements, but that's optional :-)
+    return(object)
   }
 )
 
@@ -88,6 +88,9 @@ objects <- lapply(
 # Now we'll combine objects each object according to their batch ID. 
 # Just combine all objects from each batch.
 
+# FIXME: merging objects by index can be dangerous. Is there a way to make sure
+# the objects at each position in `objects` are actually what they are expected
+# to be?
 batch4_merged <- merge(objects[[1]], c(objects[[2]],
                                        objects[[3]],
                                        objects[[4]],
@@ -136,6 +139,8 @@ VlnPlot(batch1_merged,
 
 ```{r}
 
+# FIXME: global parameters are best set at the top of the document, so they 
+# are easy to spot.
 nFeature_cutoff <- 500
 nCount_cutoff <- 25000
 mito_cutoff <- 10
@@ -198,6 +203,9 @@ batch1_merged <-
 # (defaults to 2000, but we can up this if desired)
 
 # parallelization using the future package
+
+# FIXME: these are global settings that are best placed at the top of the
+# document.
 future::plan("multiprocess", workers = 4)
 options(future.globals.maxSize = 12000 * 1024 ^ 2)
 
@@ -209,7 +217,10 @@ anchors <-
 integrated_object <- IntegrateData(anchors)
 
 future::plan("sequential")
+
 # Time to save off this object, since we'll be using it in the next vignette.
+
+# FIXME: this is a path that might not work on somebody else's computer.
 saveRDS(integrated_object, file = "~/Study1_integrated.Rds")
 ```
 
