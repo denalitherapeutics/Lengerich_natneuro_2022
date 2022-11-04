@@ -44,10 +44,7 @@ CMOs <-
 
 ## Read in all 20 of the sample data sets
 ```{r}
-metadata <- read.csv(paste0(
-  here(), 
-  "/inst/extdata/Study2_sample_metadata.csv")
-)
+metadata <- read.csv(here("inst", "extdata", "Study2_sample_metadata.csv"))
 
 Pool1_samples <- c("TW01", "TW02", "TW03", "TW04", "TW05")
 
@@ -74,10 +71,12 @@ pool4 <- list()
 # Read in Pool 1 data sets
 for (i in 1:length(Pool1_samples)) {
   object <- Seurat::Read10X(
-    paste0(
-      "/pool1/outs/per_sample_outs/",
-      Pool1_samples[i],
-      "/count/sample_filtered_feature_bc_matrix"
+    # FIXME: use file.path instead of paste0 for paths on your filesystem.
+    # (For AWS paths, use paste instead, because you know the delimiter for sure
+    # ).
+    file.path(
+      "pool1", "outs", "per_sample_outs", Pool1_samples[i], "count",
+      "sample_filtered_feature_bc_matrix"
     ),
     min.cells = 3,
     min.features = 50,
@@ -107,11 +106,12 @@ for (i in 1:length(Pool1_samples)) {
 
 # Read in Pool 2 data sets
 for (i in 1:length(Pool2_samples)) {
+  # FIXME: should this be your own s3.read10X function? Seurat::Read10X doesn
+  # have a `region` argument.
   object <- Seurat::Read10X(
-    paste0(
-      "/pool2/outs/per_sample_outs/",
-      Pool1_samples[i],
-      "/count/sample_filtered_feature_bc_matrix"
+    file.path(
+      "pool2", "outs", "per_sample_outs", Pool1_samples[i], "count",
+      "sample_filtered_feature_bc_matrix"
     ),
     region = "us-east-1",
     min.cells = 3,
@@ -142,6 +142,7 @@ for (i in 1:length(Pool2_samples)) {
 
 # Read in Pool 3 data sets
 for (i in 1:length(Pool3_samples)) {
+  # FIXME: should this be s3.read10X ?
   object <- Seurat::Read10X(
     paste0(
       "/pool1/outs/per_sample_outs/",

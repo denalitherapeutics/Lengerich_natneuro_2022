@@ -27,6 +27,8 @@ lapply(libraries, library, character.only = T)
 # Dimensionality reduction
 ```{r}
 # read in the integrated object from the prior vignette
+
+# FIXME: This is a non-portable path. Perhaps you can use a relative path?
 object <- readRDS("~/Study1_integrated.Rds")
 
 # Make sure we're working off of the integrated RNA assay for these steps
@@ -61,6 +63,8 @@ object <- object %>%
 ```
 
 ```{r, eval = FALSE}
+
+# FIXME: global options are better placed at the start of the document
 future::plan("multiprocess", workers = 4)
 options(future.globals.maxSize = 12000 * 1024 ^ 2)
 
@@ -69,21 +73,16 @@ markers <- FindAllMarkers(object)
 future::plan("sequential")
 
 write.csv(markers,
-          file = paste0(
-            here(), 
-            "/inst/extdata/Study1_cluster_markers.csv")
+          file = here("inst", "extdata", "Study1_cluster_markers.csv")
           )
 ```
 
 ```{r}
 markers <-
   read.csv(
-    paste0(
-      here(), 
-      "/inst/extdata/Study1_cluster_markers.csv"
-      ),
+    here("inst", "extdata", "Study1_cluster_markers.csv"),
     row.names = 1,
-    header = T
+    header = TRUE
   )
 
 top10 <-
@@ -104,6 +103,8 @@ FeaturePlot(object,
 Time to remove the apparent non-microglia populations.
 ```{r, eval=FALSE}
 microglia <- subset(object, subset = seurat_clusters %in% c(0, 1, 2))
+
+# FIXME: can you use a relative file path?
 saveRDS(microglia, file = "~/Study1_microglia.Rds")
 ```
 
