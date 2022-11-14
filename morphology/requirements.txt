@@ -16,7 +16,7 @@ imageio==2.21.2
 imagesize==1.4.1
 iniconfig==1.1.1
 Jinja2==3.1.2
-joblib==1.1.0
+joblib==1.2.0
 kiwisolver==1.4.4
 llvmlite==0.39.1
 lxml==4.9.1
