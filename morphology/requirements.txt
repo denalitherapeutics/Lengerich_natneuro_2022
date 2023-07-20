@@ -31,7 +31,7 @@ Pillow==9.3.0
 pluggy==1.0.0
 pycodestyle==2.9.1
 pyflakes==2.5.0
-Pygments==2.13.0
+Pygments==2.15.0
 pynndescent==0.5.8
 pyparsing==3.0.9
 pytest==7.2.0
